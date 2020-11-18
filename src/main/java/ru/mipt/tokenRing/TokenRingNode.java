@@ -1,4 +1,5 @@
 package ru.mipt.tokenRing;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,24 +22,23 @@ public class TokenRingNode implements Runnable {
     @Override
     public void run() {
         while (true) {
-            if (dataPackage != null) {
-                if (dataPackage.getDestination() != this.nodeNumber) {
-                    sendDataPackage();
-                }
+            if (this.dataPackage != null) {
+                sendDataPackage(this.dataPackage);
+                this.dataPackage = null;
             }
         }
     }
 
-    public synchronized void sendDataPackage(){
-        this.nextNode.receiveDataPackage(this.dataPackage);
-        System.out.println("following data: " + this.dataPackage.getData() + " was sent by: " + this.nodeNumber);
-        this.setDataPackage(null);
+
+    public void sendDataPackage(DataPackage inputDataPackage) {
+        System.out.println(inputDataPackage + " was sent by node" + this.nodeNumber);
+        this.nextNode.receiveDataPackage(inputDataPackage);
     }
 
-    public synchronized void receiveDataPackage(DataPackage dataPackage){
+    public void receiveDataPackage(DataPackage outputDataPackage) {
         while (this.dataPackage != null) {
         }
-        setDataPackage(dataPackage);
-        System.out.println("following data: " + this.dataPackage.getData() + " received by: " + this.nodeNumber);
+        this.dataPackage = outputDataPackage;
+        System.out.println(outputDataPackage + " received by node" + this.nodeNumber);
     }
 }

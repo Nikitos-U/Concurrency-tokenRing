@@ -18,6 +18,10 @@ public class TokenRingStarter {
         Thread thread4 = new Thread(node4);
         Thread thread5 = new Thread(node5);
 
+        zeroNode.setDataPackage(new DataPackage(0, 1, "some data for 1"));
+        node1.setDataPackage(new DataPackage(1, 2, "ANOTHER data for 2"));
+        node4.setDataPackage(new DataPackage(4, 2, "lolololololol"));
+
         thread0.start();
         thread1.start();
         thread2.start();
@@ -25,7 +29,5 @@ public class TokenRingStarter {
         thread4.start();
         thread5.start();
 
-        zeroNode.setDataPackage(new DataPackage(0, 5, "some data for 5"));
-        node5.setDataPackage(new DataPackage(5, 0, "ANOTHER data for 0"));
     }
 }
