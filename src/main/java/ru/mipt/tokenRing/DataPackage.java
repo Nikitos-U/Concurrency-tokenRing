@@ -6,5 +6,5 @@ import lombok.Data;
 public class DataPackage {
     private final int sender;
     private final int destination;
-    private final String data;
+    private final long transferStartTime;
 }
