@@ -2,6 +2,7 @@ package ru.mipt.tokenRing;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import ru.mipt.tokenRing.noQueueImplementation.SimpleTokenRingNode;
 
 import java.util.ArrayList;
 
