@@ -33,9 +33,13 @@ public class QueueConsumingTokenRingNode implements Runnable, QueuedTokenRingNod
                     sendDataPackage(this.dataPackage);
                 } else {
                     this.latency = nanoTime() - this.dataPackage.getTransferStartTime();
-                    sendDataPackage(this.dataPackage);
+                    if (this.dataPackage.getSender() == this.nodeNumber) {
+                        sendDataPackage(new DataPackage(this.nodeNumber, this.dataPackage.getDestination(), nanoTime()));
+                    } else {
+                        sendDataPackage(this.dataPackage);
+                    }
+                    this.dataPackage = null;
                 }
-                this.dataPackage = null;
             }
             while (this.dataPackage == null) {
                 receiveDataPackage();
