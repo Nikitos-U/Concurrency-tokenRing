@@ -10,17 +10,15 @@ public class TokenRingStarter {
     public static void main(String[] args) {
         MediumQueue queue0 = new MediumQueue();
         MediumQueue queue1 = new MediumQueue();
-        QueueConsumingTokenRingNode node0 = new QueueConsumingTokenRingNode(0);
+        QueueConsumingTokenRingNode node0 = new QueueConsumingTokenRingNode(0, queue1, queue0);
         QueueConsumingTokenRingNode node1 = new QueueConsumingTokenRingNode(1, queue0, queue1);
-        node0.setMediums(queue1, queue0);
-        queue0.put(new DataPackage(0, 1, nanoTime()));
+        queue0.put(new DataPackage(1, 0, nanoTime()));
 
         Thread thread0 = new Thread(node0);
         Thread thread1 = new Thread(node1);
 
         thread0.start();
         thread1.start();
-        System.out.println("SOSI PISOS");
 //        SimpleConsumingTokenRingNode node0 = new SimpleConsumingTokenRingNode(0);
 //        SimpleConsumingTokenRingNode node1 = new SimpleConsumingTokenRingNode(1, node0);
 //        SimpleConsumingTokenRingNode node2 = new SimpleConsumingTokenRingNode(2, node1);
