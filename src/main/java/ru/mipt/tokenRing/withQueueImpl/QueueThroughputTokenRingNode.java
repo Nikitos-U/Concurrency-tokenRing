@@ -10,15 +10,18 @@ import static java.lang.Thread.sleep;
 
 @Data
 @AllArgsConstructor
-public class QueueConsumingTokenRingNode implements Runnable, QueuedTokenRingNode {
+public class QueueThroughputTokenRingNode implements Runnable, QueuedTokenRingNode {
     private DataPackage dataPackage;
     private final int nodeNumber;
     private MediumQueue nextMedium;
     private MediumQueue previousMedium;
     private long latency;
     private long artificialNodeLatency = 0;
+    private int msgsNumber = 0;
+    private long throughputStartTime = 0L;
+    private long throughput = 0L;
 
-    public QueueConsumingTokenRingNode(int nodeNumber, MediumQueue previousMedium, MediumQueue nextMedium) {
+    public QueueThroughputTokenRingNode(int nodeNumber, MediumQueue previousMedium, MediumQueue nextMedium) {
         this.nodeNumber = nodeNumber;
         this.previousMedium = previousMedium;
         this.nextMedium = nextMedium;
@@ -29,17 +32,11 @@ public class QueueConsumingTokenRingNode implements Runnable, QueuedTokenRingNod
     public void run() {
         while (true) {
             if (this.dataPackage != null) {
-                if (this.dataPackage.getDestination() != this.nodeNumber) {
-                    if (this.dataPackage.getSender() == this.nodeNumber) {
-                        sleep(artificialNodeLatency);
-                        sendDataPackage(new DataPackage(this.nodeNumber, this.dataPackage.getDestination(), nanoTime()));
-                    } else {
-                        sleep(artificialNodeLatency);
-                        sendDataPackage(this.dataPackage);
-                    }
+                if (this.dataPackage.getSender() == this.nodeNumber) {
+                    sleep(artificialNodeLatency);
+                    sendDataPackage(new DataPackage(this.nodeNumber, this.dataPackage.getDestination(), nanoTime()));
                 } else {
                     sleep(artificialNodeLatency);
-                    this.latency = nanoTime() - this.dataPackage.getTransferStartTime();
                     sendDataPackage(this.dataPackage);
                 }
                 this.dataPackage = null;
@@ -50,6 +47,7 @@ public class QueueConsumingTokenRingNode implements Runnable, QueuedTokenRingNod
         }
     }
 
+
     @Override
     public void sendDataPackage(DataPackage inputDataPackage) {
         this.nextMedium.put(inputDataPackage);
@@ -59,13 +57,25 @@ public class QueueConsumingTokenRingNode implements Runnable, QueuedTokenRingNod
     public void receiveDataPackage() {
         try {
             this.dataPackage = this.previousMedium.getData();
+        } catch (NullPointerException ignored) {
         }
-        catch (NullPointerException ignored){
+        if (this.dataPackage != null){
+            if (this.msgsNumber == 0) {
+                this.throughputStartTime = nanoTime();
+            }
+            if (nanoTime() - throughputStartTime <= 1000000000){
+                msgsNumber++;
+            } else {
+                this.throughput = msgsNumber;
+                this.throughputStartTime = nanoTime();
+                msgsNumber = 1;
+            }
         }
     }
 
-    public void setMediums(MediumQueue previousMedium, MediumQueue nextMedium){
+    public void setMediums(MediumQueue previousMedium, MediumQueue nextMedium) {
         this.previousMedium = previousMedium;
         this.nextMedium = nextMedium;
     }
+
 }

@@ -1,17 +1,18 @@
 package ru.mipt.tokenRing;
 
-import ru.mipt.tokenRing.noQueueImplementation.SimpleConsumingTokenRingNode;
+import lombok.SneakyThrows;
 import ru.mipt.tokenRing.withQueueImpl.MediumQueue;
-import ru.mipt.tokenRing.withQueueImpl.QueueConsumingTokenRingNode;
+import ru.mipt.tokenRing.withQueueImpl.QueueThroughputTokenRingNode;
 
 import static java.lang.System.nanoTime;
 
 public class TokenRingStarter {
+    @SneakyThrows
     public static void main(String[] args) {
         MediumQueue queue0 = new MediumQueue();
         MediumQueue queue1 = new MediumQueue();
-        QueueConsumingTokenRingNode node0 = new QueueConsumingTokenRingNode(0, queue1, queue0);
-        QueueConsumingTokenRingNode node1 = new QueueConsumingTokenRingNode(1, queue0, queue1);
+        QueueThroughputTokenRingNode node0 = new QueueThroughputTokenRingNode(0, queue1, queue0);
+        QueueThroughputTokenRingNode node1 = new QueueThroughputTokenRingNode(1, queue0, queue1);
         queue0.put(new DataPackage(1, 0, nanoTime()));
 
         Thread thread0 = new Thread(node0);
@@ -19,6 +20,14 @@ public class TokenRingStarter {
 
         thread0.start();
         thread1.start();
+
+        for (int i = 0; i < 100; i++) {
+//            System.out.println(node0.getMsgsNumber());
+//            System.out.println(node1.getMsgsNumber());
+            Thread.sleep(10);
+        }
+        System.out.println(node0.getThroughput());
+        System.out.println(node1.getThroughput());
 //        SimpleConsumingTokenRingNode node0 = new SimpleConsumingTokenRingNode(0);
 //        SimpleConsumingTokenRingNode node1 = new SimpleConsumingTokenRingNode(1, node0);
 //        SimpleConsumingTokenRingNode node2 = new SimpleConsumingTokenRingNode(2, node1);

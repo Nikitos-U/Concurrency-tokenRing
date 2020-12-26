@@ -95,9 +95,14 @@ public class QueueConsumingTokenRingNodeLatencyTest {
     void wholeRingAllPackagesTransferBenchmark() {
         File csvOutputFile = new File("");
         PrintWriter pw = new PrintWriter(new FileOutputStream(csvOutputFile, true));
+//        pw.println("buffer size, load %, const latency ms, latency ns");
+        Long artificialLatency = 100L;
+        for (QueueConsumingTokenRingNode node : nodes) {
+            node.setArtificialNodeLatency(artificialLatency);
+        }
         warmUp();
         startThreads();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 40; i++) {
             queue0.put(new DataPackage(1, 0, nanoTime()));
             queue1.put(new DataPackage(2, 1, nanoTime()));
             queue2.put(new DataPackage(3, 2, nanoTime()));
@@ -110,10 +115,8 @@ public class QueueConsumingTokenRingNodeLatencyTest {
             queue9.put(new DataPackage(0, 9, nanoTime()));
         }
         for (int i = 0; i < 100; i++) {
-            for (QueueConsumingTokenRingNode node : nodes) {
-                pw.println("5, 80, " + node.getLatency());
-            }
-            sleep(10);
+            pw.println("50, 50, 100, " + (node3.getLatency() - artificialLatency * 1000000 * 9));
+            sleep(10000);
         }
         pw.close();
         threadsStop();
@@ -123,7 +126,7 @@ public class QueueConsumingTokenRingNodeLatencyTest {
     @Test
     void wholeRingAllNodeNumbers() {
         startThreads();
-        File csvOutputFile = new File("/Users/a18535673/Projects/Concurrency-tokenRing/src/main/resources/queueNoArtificialLatencyTestResults.csv");
+        File csvOutputFile = new File("");
         PrintWriter pw = new PrintWriter(csvOutputFile);
         pw.println("num of nodes, num of messages, latency ns");
         warmUp();
