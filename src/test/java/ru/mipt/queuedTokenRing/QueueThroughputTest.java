@@ -98,7 +98,7 @@ public class QueueThroughputTest {
     @SneakyThrows
     @Test
     void wholeRingAllPackagesTransferBenchmark() {
-        File csvOutputFile = new File("/Users/a18535673/Projects/Concurrency-tokenRing/src/main/resources/queueWithArtificialLatencyThroughputTest.csv");
+        File csvOutputFile = new File("");
         PrintWriter pw = new PrintWriter(new FileOutputStream(csvOutputFile, true));
 //        pw.println("buffer size, load %, const latency ms, throughput 1/s");
         Long artificialLatency = 10L;
@@ -123,6 +123,39 @@ public class QueueThroughputTest {
                 pw.println("20, 80, 10, " + node.getThroughput());
             }
             sleep(1000);
+        }
+        pw.close();
+        threadsStop();
+    }
+
+    @SneakyThrows
+    @Test
+    void throughputOnTokenNumberTest() {
+        File csvOutputFile = new File("/Users/a18535673/Projects/Concurrency-tokenRing/src/main/resources/throughputOnTokensNumberTest.csv");
+        PrintWriter pw = new PrintWriter(new FileOutputStream(csvOutputFile, true));
+//        pw.println("buffer size, number of tokens, const latency ms, throughput 1/s");
+        Long artificialLatency = 10L;
+        for (QueueThroughputTokenRingNode node : nodes) {
+            node.setArtificialNodeLatency(artificialLatency);
+        }
+        startThreads();
+        for (int i = 0; i < 5; i++) {
+            queue0.put(new DataPackage(1, 0, nanoTime()));
+            queue1.put(new DataPackage(2, 1, nanoTime()));
+            queue2.put(new DataPackage(3, 2, nanoTime()));
+            queue3.put(new DataPackage(4, 3, nanoTime()));
+            queue4.put(new DataPackage(5, 4, nanoTime()));
+            queue5.put(new DataPackage(6, 5, nanoTime()));
+            queue6.put(new DataPackage(7, 6, nanoTime()));
+            queue7.put(new DataPackage(8, 7, nanoTime()));
+            queue8.put(new DataPackage(9, 8, nanoTime()));
+            queue9.put(new DataPackage(0, 9, nanoTime()));
+            for (int j = 0; j < 5; j++) {
+                for (QueueThroughputTokenRingNode node : nodes){
+                    pw.println("5, " + ((i + 1) * 10) + ", 10, " + node.getThroughput());
+                }
+                sleep(1000);
+            }
         }
         pw.close();
         threadsStop();

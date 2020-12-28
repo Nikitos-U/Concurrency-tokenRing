@@ -96,13 +96,13 @@ public class QueueConsumingTokenRingNodeLatencyTest {
         File csvOutputFile = new File("");
         PrintWriter pw = new PrintWriter(new FileOutputStream(csvOutputFile, true));
 //        pw.println("buffer size, load %, const latency ms, latency ns");
-        Long artificialLatency = 100L;
+        Long artificialLatency = 10L;
         for (QueueConsumingTokenRingNode node : nodes) {
             node.setArtificialNodeLatency(artificialLatency);
         }
         warmUp();
         startThreads();
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 1; i++) {
             queue0.put(new DataPackage(1, 0, nanoTime()));
             queue1.put(new DataPackage(2, 1, nanoTime()));
             queue2.put(new DataPackage(3, 2, nanoTime()));
@@ -115,8 +115,39 @@ public class QueueConsumingTokenRingNodeLatencyTest {
             queue9.put(new DataPackage(0, 9, nanoTime()));
         }
         for (int i = 0; i < 100; i++) {
-            pw.println("50, 50, 100, " + (node3.getLatency() - artificialLatency * 1000000 * 9));
-            sleep(10000);
+            pw.println("10, 10, 10, " + (nodes.get(i % 10).getLatency() - artificialLatency * 1000000 * 9));
+            sleep(1000);
+        }
+        pw.close();
+        threadsStop();
+    }
+
+    @SneakyThrows
+    @Test
+    void latencyOnNodeNumberTest() {
+        File csvOutputFile = new File("/Users/a18535673/Projects/Concurrency-tokenRing/src/main/resources/latencyOnTokensNumberTest.csv");
+        PrintWriter pw = new PrintWriter(new FileOutputStream(csvOutputFile, true));
+//        pw.println("buffer size, number of tokens, const latency ms, latency ns");
+        Long artificialLatency = 2L;
+        for (QueueConsumingTokenRingNode node : nodes) {
+            node.setArtificialNodeLatency(artificialLatency);
+        }
+        startThreads();
+        for (int i = 0; i < 5; i++) {
+            queue0.put(new DataPackage(1, 0, nanoTime()));
+            queue1.put(new DataPackage(2, 1, nanoTime()));
+            queue2.put(new DataPackage(3, 2, nanoTime()));
+            queue3.put(new DataPackage(4, 3, nanoTime()));
+            queue4.put(new DataPackage(5, 4, nanoTime()));
+            queue5.put(new DataPackage(6, 5, nanoTime()));
+            queue6.put(new DataPackage(7, 6, nanoTime()));
+            queue7.put(new DataPackage(8, 7, nanoTime()));
+            queue8.put(new DataPackage(9, 8, nanoTime()));
+            queue9.put(new DataPackage(0, 9, nanoTime()));
+            for (int j = 0; j < 10; j++) {
+                pw.println("20, " + ((i + 1) * 10) + ", 2, " + (nodes.get(j % 10).getLatency() - artificialLatency * 1000000 * 9));
+                sleep(1000);
+            }
         }
         pw.close();
         threadsStop();

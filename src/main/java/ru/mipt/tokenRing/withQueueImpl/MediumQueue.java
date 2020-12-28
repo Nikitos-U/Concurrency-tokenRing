@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue;
 
 @Data
 public class MediumQueue {
-    private final BlockingQueue<DataPackage> blockingQueue = new ArrayBlockingQueue<>(20);
+    private final BlockingQueue<DataPackage> blockingQueue = new ArrayBlockingQueue<>(5);
 
     @SneakyThrows
     public void put(DataPackage dataPackage){
